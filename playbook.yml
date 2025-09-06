@@ -1,13 +1,15 @@
-- name: Ping public IPs with ICMP
-  hosts: myhosts
-  gather_facts: no
-  tasks:
-    - name: ICMP ping {{ inventory_hostname }}
-      ansible.builtin.command: "ping -c 1 -W 1 {{ ansible_host }}"
-      register: result
-      ignore_errors: yes
-      delegate_to: localhost
+- name: Ping public IPs with ICMP # Name of the play, just a label for humans
+  hosts: myhosts # Run against all hosts in group "myhosts" from inventory
+  gather_facts: no # Skip collecting system info (no SSH needed)
 
-    - name: Show result
-      ansible.builtin.debug:
+  tasks: # Start of the task list
+    - name: ICMP ping {{ inventory_hostname }} # Task name, shows which host we are pinging
+      ansible.builtin.command: "ping -c 1 -W 1 {{ ansible_host }}" # Run system ping with 1 packet and 1s timeout
+      register: result # Save the output of ping command into variable "result"
+      ignore_errors: yes # Continue even if ping fails
+      delegate_to: localhost # Run the ping on the control machine, not on the target host
+
+    - name: Show result # Second task: display the result
+      ansible.builtin.debug: # Use the debug module to print a message
         msg: "{{ inventory_hostname }} ({{ ansible_host }}) => {{ 'OK' if result.rc == 0 else 'FAIL' }}"
+        # Print host name, IP, and "OK" if ping succeeded, otherwise "FAIL"
