@@ -1,24 +1,15 @@
-# ansible-docker-demo
+# ansible-quickstart
 
-Installs Docker on a managed Ubuntu container.
+This repository demonstrates how to use **Ansible** to install Docker on a managed Ubuntu container.  
+The controller node is your local machine, and the managed node is a Docker container running Ubuntu with SSH access.
 
-## Inventory
+---
 
-`inventories/dev/hosts.yml` points to a local Ubuntu container on port 2222.
+## 📦 Prerequisites
 
-## Quickstart
-
-```bash
-# (optional) Use a virtual env
-python3 -m venv .venv && source .venv/bin/activate
-pip install --upgrade pip ansible
-
-# Sanity check: can Ansible reach the host?
-ansible all -m ping
-
-# Run the playbook
-ansible-playbook playbooks/install-docker.yml
-
-# Verify Docker on the managed node
-ssh -i ~/.ssh/ansible -p 2222 ansible@127.0.0.1 'docker --version && docker run --rm hello-world'
-```
+- Docker installed on your local machine
+- Python 3 & Ansible installed locally
+  ```bash
+  python3 -m venv .venv && source .venv/bin/activate
+  pip install --upgrade pip ansible
+  ```
