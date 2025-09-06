@@ -1,0 +1,13 @@
+- name: Ping public IPs with ICMP
+  hosts: myhosts
+  gather_facts: no
+  tasks:
+    - name: ICMP ping {{ inventory_hostname }}
+      ansible.builtin.command: "ping -c 1 -W 1 {{ ansible_host }}"
+      register: result
+      ignore_errors: yes
+      delegate_to: localhost
+
+    - name: Show result
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} ({{ ansible_host }}) => {{ 'OK' if result.rc == 0 else 'FAIL' }}"

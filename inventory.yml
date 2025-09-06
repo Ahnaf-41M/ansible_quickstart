@@ -1,0 +1,10 @@
+myhosts:
+  hosts:
+    google_dns_1:
+      ansible_host: 8.8.8.8
+    google_dns_2:
+      ansible_host: 8.8.4.4
+    cloudflare_dns_1:
+      ansible_host: 1.1.1.1
+    cloudflare_dns_2:
+      ansible_host: 1.0.0.1
