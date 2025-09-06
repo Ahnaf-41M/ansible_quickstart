@@ -1,0 +1,63 @@
+- name: Install Docker on Ubuntu
+  hosts: all
+  become: yes
+
+  vars:
+    docker_pkgs:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+  tasks:
+    - name: Install prerequisites for Docker repo
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+        update_cache: true
+
+    - name: Add Docker's official GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker packages
+      ansible.builtin.apt:
+        name: "{{ docker_pkgs }}"
+        state: present
+        update_cache: true
+
+    - name: Ensure Docker service is enabled and started
+      ansible.builtin.service:
+        name: docker
+        state: started # checks if the service is already running; if not, it runs systemctl start docker.
+        enabled: true # without this, Docker would not start after a system reboot (systemctl enable docker)
+
+    # We don’t need this at all when ansible_user = root
+    # The following task will only run for non root users
+    - name: Add current SSH user to docker group (if present)
+      ansible.builtin.user:
+        name: "{{ ansible_user | default('ansible') }}"
+        groups: docker
+        append: yes
+      when: ansible_user != 'root'
+      register: add_group
+
+    # changed_when: false forces Ansible to always report “ok”.
+    # Running docker --version is a check, not a change — this keeps playbook output accurate.
+    - name: Show Docker version
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Print Docker version
+      ansible.builtin.debug:
+        msg: "{{ docker_version.stdout }}"
